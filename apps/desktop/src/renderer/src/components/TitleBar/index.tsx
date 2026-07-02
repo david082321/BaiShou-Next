@@ -8,8 +8,7 @@ import {
   MdCropSquare,
   MdClose,
   MdFolderShared,
-  MdArrowDropDown,
-  MdWorkspaces
+  MdArrowDropDown
 } from 'react-icons/md'
 import { useTranslation } from 'react-i18next'
 import { isIncrementalSyncReady, buildAgentChatNavigationPath } from '@baishou/shared'
@@ -206,13 +205,6 @@ export const TitleBar: React.FC = () => {
               <MdAutoAwesome className={styles.tabIcon} />
               <span>{t('nav.agent', '伙伴')}</span>
             </div>
-            <div
-              className={`${styles.tab} ${isAgentWorkspace && !isSettings ? styles.activeTab : ''}`}
-              onClick={() => navigate('/agent-workspace')}
-            >
-              <MdWorkspaces className={styles.tabIcon} />
-              <span>{t('nav.agent_workspace', 'Agent')}</span>
-            </div>
           </div>
         )}
       </div>
@@ -231,6 +223,7 @@ export const TitleBar: React.FC = () => {
               </div>
             )}
 
+            {!isAgentWorkspace ? (
             <div
               className={styles.vaultSwitcherWrapper}
               ref={vaultMenuRef}
@@ -281,6 +274,7 @@ export const TitleBar: React.FC = () => {
                 </div>
               )}
             </div>
+            ) : null}
 
             <div className={styles.divider}></div>
           </>

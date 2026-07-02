@@ -2224,6 +2224,7 @@
   "nav": {
     "diary": "Diary",
     "agent": "Partner",
+    "workbench": "Workbench",
     "agent_workspace": "Agent",
     "summary": "Archive",
     "settings": "Settings"
@@ -2255,6 +2256,25 @@
     "collapse_changes_panel": "Collapse changes panel",
     "expand_changes_panel": "Expand changes panel",
     "input_placeholder": "Describe the changes you want in this folder…"
+  },
+  "workbench": {
+    "files": "Files",
+    "search": "Search",
+    "git": "Git",
+    "search_placeholder": "Search file names…",
+    "search_empty": "Type to search files in the workspace",
+    "git_empty": "Git changes view coming soon",
+    "open_folder_title": "Open a folder",
+    "open_folder_desc": "Choose a folder as the workbench root to browse files and collaborate with Agent.",
+    "collapse_agent": "Collapse Agent panel",
+    "expand_agent": "Expand Agent panel",
+    "changed_files": "{{count}} changed files",
+    "preview_unsupported": "Editing is not supported for this file type. Preview only.",
+    "loading_file": "Loading file…",
+    "load_file_failed": "Failed to load file",
+    "new_tab": "New tab",
+    "settings": "Settings",
+    "diary": "Diary"
   },
   "file_change": {
     "changes_title": "Changes",

@@ -2233,6 +2233,7 @@
   "nav": {
     "diary": "日記",
     "agent": "夥伴",
+    "workbench": "工作台",
     "agent_workspace": "Agent",
     "summary": "概覽"
   },
@@ -2262,6 +2263,25 @@
     "collapse_changes_panel": "收起變更面板",
     "expand_changes_panel": "展開變更面板",
     "input_placeholder": "描述你想對資料夾做的修改…"
+  },
+  "workbench": {
+    "files": "檔案",
+    "search": "搜尋",
+    "git": "Git",
+    "search_placeholder": "搜尋檔名…",
+    "search_empty": "輸入關鍵字搜尋工作區檔案",
+    "git_empty": "Git 變更檢視即將推出",
+    "open_folder_title": "開啟資料夾",
+    "open_folder_desc": "選擇一個資料夾作為工作台根目錄，瀏覽檔案並與 Agent 協作。",
+    "collapse_agent": "收起 Agent 面板",
+    "expand_agent": "展開 Agent 面板",
+    "changed_files": "已變更 {{count}} 個檔案",
+    "preview_unsupported": "此檔案類型暫不支援編輯，僅顯示預覽。",
+    "loading_file": "正在載入檔案…",
+    "load_file_failed": "無法載入檔案",
+    "new_tab": "新分頁",
+    "settings": "設定",
+    "diary": "日記"
   },
   "file_change": {
     "changes_title": "變更列表",

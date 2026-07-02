@@ -19,7 +19,8 @@ import {
   MdOutlineHub,
   MdSync,
   MdEditNote,
-  MdTextSnippet
+  MdTextSnippet,
+  MdWorkspaces
 } from 'react-icons/md'
 import { SETTINGS_HUB_PREFIX } from '../../features/settings/settings-route.util'
 
@@ -29,11 +30,18 @@ export function sidebarNavIcon(icon: React.ReactElement<{ size?: number }>): Rea
   return React.cloneElement(icon, { size: SIDEBAR_NAV_ICON_SIZE })
 }
 
-export const DEFAULT_VISIBLE_NAV_IDS = ['diary', 'summary', 'incremental-sync', 'git'] as const
+export const DEFAULT_VISIBLE_NAV_IDS = [
+  'diary',
+  'workbench',
+  'summary',
+  'incremental-sync',
+  'git'
+] as const
 
 /** 与系统设置侧边栏条目一一对应（另含日记区核心页 diary / summary） */
 export const ALL_SIDEBAR_NAV_IDS = [
   'diary',
+  'workbench',
   'summary',
   'diary-template',
   'diary-ai-writing',
@@ -89,7 +97,7 @@ export const SIDEBAR_NAV_GROUPS: SidebarNavGroupDef[] = [
     key: 'diary',
     labelKey: 'sidebar.group_diary',
     defaultLabel: '日记与回忆',
-    itemIds: ['diary', 'summary', 'diary-template', 'diary-ai-writing', 'summary-settings']
+    itemIds: ['diary', 'workbench', 'summary', 'diary-template', 'diary-ai-writing', 'summary-settings']
   },
   {
     key: 'settings-general',
@@ -119,6 +127,7 @@ export const SIDEBAR_NAV_GROUPS: SidebarNavGroupDef[] = [
 
 export const SIDEBAR_NAV_PATHS: Record<SidebarNavId, string> = {
   diary: '/diary',
+  workbench: '/agent-workspace',
   summary: '/summary',
   'diary-template': `${SETTINGS_HUB_PREFIX}/diary-template`,
   'diary-ai-writing': `${SETTINGS_HUB_PREFIX}/diary-ai-writing`,
@@ -149,6 +158,11 @@ export function buildSidebarNavItems(t: TFunction): Record<SidebarNavId, Sidebar
   const icon = sidebarNavIcon
   return {
     diary: { icon: icon(<MdTimeline />), label: t('diary.title', '日记'), path: '/diary' },
+    workbench: {
+      icon: icon(<MdWorkspaces />),
+      label: t('nav.workbench', '工作台'),
+      path: '/agent-workspace'
+    },
     summary: {
       icon: icon(<MdAutoStories />),
       label: t('summary.dashboard_title', '回忆'),
