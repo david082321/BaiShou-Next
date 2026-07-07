@@ -255,6 +255,7 @@ export * from './utils/app-ui-locale.util'
 export * from './utils/message-attachment.util'
 export * from './utils/attachment-reference.util'
 export * from './utils/version-control-path.util'
+export * from './utils/git-commit-message.util'
 
 export { threeWayMerge, type MergeDecision } from './sync/three-way-merge'
 export type {
