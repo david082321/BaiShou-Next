@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next'
 export function useInputBar(props: InputBarProps, ref: React.ForwardedRef<InputBarRef>) {
   const {
     isLoading,
+    sendDisabled = false,
     onSend,
     onStop,
     assistantName,
@@ -107,6 +108,7 @@ export function useInputBar(props: InputBarProps, ref: React.ForwardedRef<InputB
   }))
 
   const handleSend = () => {
+    if (sendDisabled) return
     if ((!text.trim() && attachments.length === 0) || isLoading) return
     onSend(text.trim(), attachments.length > 0 ? [...attachments] : undefined, searchMode)
     setText('')
@@ -121,7 +123,7 @@ export function useInputBar(props: InputBarProps, ref: React.ForwardedRef<InputB
     if (e.key === 'Enter' && !e.shiftKey) {
       if (shortcutHandlers.shortcutModeActive && text.startsWith('/')) return
       e.preventDefault()
-      handleSend()
+      if (!sendDisabled) handleSend()
     }
   }
 
@@ -173,6 +175,7 @@ export function useInputBar(props: InputBarProps, ref: React.ForwardedRef<InputB
     toggleSearchMode: () => onToggleSearchMode?.(),
     handlePromptShortcut,
     isLoading,
+    sendDisabled,
     onStop,
     assistantName,
     onAssistantTap,

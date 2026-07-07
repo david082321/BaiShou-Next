@@ -26,6 +26,25 @@ function pushDecoration(
   if (from < to) marks.push(value.range(from, to))
 }
 
+function atxHeadingLevel(nodeName: string): number | null {
+  const match = /^ATXHeading(\d)$/.exec(nodeName)
+  if (!match) return null
+  return Number(match[1])
+}
+
+function hideHeaderMark(
+  marks: DecorationMark[],
+  node: SyntaxNodeRef,
+  cursors: number[],
+  onActiveLine: boolean,
+  hideTrailingSpaceTo: number
+): void {
+  const cursorInMarker = isCursorInRange(node.from, node.to, cursors)
+  if (!onActiveLine || !cursorInMarker) {
+    pushDecoration(marks, hideMark, node.from, hideTrailingSpaceTo)
+  }
+}
+
 export function collectTreeDecorations(
   view: EditorView,
   cursors: number[],
@@ -78,24 +97,42 @@ export function collectTreeDecorations(
         return
       }
 
-      if (name.startsWith('ATXHeading')) {
-        const text = doc.sliceString(node.from, node.to)
-        const match = text.match(/^(#{1,6})\s?/)
-        if (match) {
-          const prefixEnd = node.from + match[0].length
-          const cursorInMarker = isCursorInRange(node.from, prefixEnd, cursors)
-          if (!onActiveLine || !cursorInMarker) {
-            pushDecoration(marks, hideMark, node.from, prefixEnd)
-          }
-          const level = match[1]!.length
-          pushDecoration(
-            marks,
-            headingStyles[level]!,
-            cursorInMarker ? node.from : prefixEnd,
-            node.to
-          )
+      if (name === 'HeaderMark') {
+        let hideTo = node.to
+        while (hideTo < doc.length && doc.sliceString(hideTo, hideTo + 1) === ' ') {
+          hideTo++
         }
+        hideHeaderMark(marks, node, cursors, onActiveLine, hideTo)
         return
+      }
+
+      const headingLevel = atxHeadingLevel(name)
+      if (headingLevel != null) {
+        marks.push(
+          Decoration.line({ class: `cm-wb-line-h${headingLevel}` }).range(line.from)
+        )
+        const text = doc.sliceString(node.from, node.to)
+        const match = text.match(/^(#{1,6})(\s?)/)
+        const hashLen = match?.[1]?.length ?? 0
+        const prefixEnd = match ? node.from + match[0].length : node.from
+        const cursorInHash =
+          hashLen > 0 && isCursorInRange(node.from, node.from + hashLen, cursors)
+        if (!onActiveLine || !cursorInHash) {
+          pushDecoration(marks, hideMark, node.from, prefixEnd)
+        }
+        const contentFrom = cursorInHash ? node.from : prefixEnd
+        if (contentFrom < node.to) {
+          pushDecoration(marks, headingStyles[headingLevel]!, contentFrom, node.to)
+        }
+        return false
+      }
+
+      if (name === 'HorizontalRule') {
+        if (!onActiveLine) {
+          marks.push(Decoration.line({ class: 'cm-wb-hr' }).range(line.from))
+          pushDecoration(marks, hideMark, node.from, node.to)
+        }
+        return false
       }
 
       if (name === 'StrongEmphasis') {

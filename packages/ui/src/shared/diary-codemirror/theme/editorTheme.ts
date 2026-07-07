@@ -118,6 +118,18 @@ export const editorTheme = EditorView.baseTheme({
   '.cm-activeLine.cm-code-line': {
     backgroundColor: 'var(--bg-surface-normal) !important'
   },
+  '.cm-line.cm-wb-hr': {
+    position: 'relative'
+  },
+  '.cm-line.cm-wb-hr::after': {
+    content: '""',
+    position: 'absolute',
+    left: '0',
+    right: '0',
+    top: '50%',
+    borderTop: '1px solid var(--border-subtle)',
+    pointerEvents: 'none'
+  },
   '.cm-code-line-top': {
     paddingTop: '8px !important',
     borderTopLeftRadius: '8px',

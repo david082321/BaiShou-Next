@@ -47,7 +47,7 @@ export function createDiaryCodeMirrorExtensions(
     keymap.of([...defaultKeymap, ...historyKeymap, ...searchKeymap, indentWithTab]),
     markdown({ base: markdownLanguage }),
     cmPlaceholder(placeholder || ''),
-    livePreviewPlugin(platform),
+    ...livePreviewPlugin(platform),
     livePreviewSyntaxHighlighting(),
     attachmentUrlPlugin(resolveUrl),
     ...(onChange

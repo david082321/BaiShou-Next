@@ -2,6 +2,11 @@ import { ViewPlugin, type DecorationSet, type EditorView, type ViewUpdate } from
 import { forceImageRefresh } from './effects'
 import { buildMarkerHidingDecorations } from './build'
 import type { DiaryCmPlatform } from '../types'
+import {
+  livePreviewFreezeMousePlugin,
+  previewFrozenField,
+  shouldSkipPreviewRebuildOnFrozen
+} from './livePreviewFreeze'
 
 function normalizePlatform(
   resolveUrlOrPlatform?: ((url: string) => string) | DiaryCmPlatform
@@ -21,22 +26,32 @@ export function livePreviewPlugin(
 ) {
   const platform = normalizePlatform(resolveUrlOrPlatform)
 
-  return ViewPlugin.fromClass(
-    class {
-      decorations: DecorationSet
-      constructor(view: EditorView) {
-        this.decorations = buildMarkerHidingDecorations(view, platform)
-      }
-      update(update: ViewUpdate) {
-        if (
-          update.docChanged ||
-          update.selectionSet ||
-          update.transactions.some((t) => t.effects.some((e) => e.is(forceImageRefresh)))
-        ) {
-          this.decorations = buildMarkerHidingDecorations(update.view, platform)
+  return [
+    previewFrozenField,
+    livePreviewFreezeMousePlugin,
+    ViewPlugin.fromClass(
+      class {
+        decorations: DecorationSet
+        constructor(view: EditorView) {
+          this.decorations = buildMarkerHidingDecorations(view, platform)
         }
-      }
-    },
-    { decorations: (v) => v.decorations }
-  )
+        update(update: ViewUpdate) {
+          const prevFrozen = update.startState.field(previewFrozenField)
+          const nextFrozen = update.state.field(previewFrozenField)
+          const justUnfroze = prevFrozen && !nextFrozen
+
+          if (shouldSkipPreviewRebuildOnFrozen(update)) return
+          if (
+            justUnfroze ||
+            update.docChanged ||
+            update.selectionSet ||
+            update.transactions.some((t) => t.effects.some((e) => e.is(forceImageRefresh)))
+          ) {
+            this.decorations = buildMarkerHidingDecorations(update.view, platform)
+          }
+        }
+      },
+      { decorations: (v) => v.decorations }
+    )
+  ]
 }

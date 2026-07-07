@@ -3,6 +3,8 @@ import type { PromptShortcut } from '../PromptShortcutSheet'
 
 export interface InputBarProps {
   isLoading: boolean
+  /** 为 true 时仍可输入，但禁止发送（如未选择模型） */
+  sendDisabled?: boolean
   onSend: (text: string, attachments?: MockChatAttachment[], searchMode?: boolean) => void
   onStop?: () => void
   assistantName?: string

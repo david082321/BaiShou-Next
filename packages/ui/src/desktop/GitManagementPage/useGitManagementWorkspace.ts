@@ -33,6 +33,8 @@ export interface UseGitManagementWorkspaceParams {
   setWorkingFileDiff: (value: FileDiff | null) => void
   handleRefreshStatus: () => Promise<void>
   handleLoadHistory: () => Promise<void>
+  onOpenDiffInEditor?: GitManagementPageProps['onOpenDiffInEditor']
+  onOpenCommitDiffInEditor?: GitManagementPageProps['onOpenCommitDiffInEditor']
 }
 
 export function useGitManagementWorkspace(params: UseGitManagementWorkspaceParams) {
@@ -63,7 +65,9 @@ export function useGitManagementWorkspace(params: UseGitManagementWorkspaceParam
     setExpandedWorkingFile,
     setWorkingFileDiff,
     handleRefreshStatus,
-    handleLoadHistory
+    handleLoadHistory,
+    onOpenDiffInEditor,
+    onOpenCommitDiffInEditor
   } = params
 
   const [destructiveConfirm, setDestructiveConfirm] =
@@ -90,6 +94,10 @@ export function useGitManagementWorkspace(params: UseGitManagementWorkspaceParam
   const handleViewDiff = useCallback(
     async (filePath: string) => {
       if (!isTextDiffablePath(filePath)) return
+      if (onOpenCommitDiffInEditor && selectedCommit) {
+        onOpenCommitDiffInEditor(filePath, selectedCommit)
+        return
+      }
       if (expandedFile === filePath) {
         setExpandedFile(null)
         setSelectedFileDiff(null)
@@ -99,12 +107,23 @@ export function useGitManagementWorkspace(params: UseGitManagementWorkspaceParam
       const diff = await onGetFileDiff(filePath, selectedCommit || undefined)
       setSelectedFileDiff(diff)
     },
-    [onGetFileDiff, selectedCommit, expandedFile, setExpandedFile, setSelectedFileDiff]
+    [
+      onGetFileDiff,
+      selectedCommit,
+      expandedFile,
+      setExpandedFile,
+      setSelectedFileDiff,
+      onOpenCommitDiffInEditor
+    ]
   )
 
   const handleViewWorkingDiff = useCallback(
     async (filePath: string, staged: boolean) => {
       if (!isTextDiffablePath(filePath)) return
+      if (onOpenDiffInEditor) {
+        onOpenDiffInEditor(filePath, staged)
+        return
+      }
       if (expandedWorkingFile?.path === filePath && expandedWorkingFile.staged === staged) {
         setExpandedWorkingFile(null)
         setWorkingFileDiff(null)
@@ -114,7 +133,7 @@ export function useGitManagementWorkspace(params: UseGitManagementWorkspaceParam
       const diff = await onGetWorkingDiff(filePath, staged)
       setWorkingFileDiff(diff)
     },
-    [onGetWorkingDiff, expandedWorkingFile, setExpandedWorkingFile, setWorkingFileDiff]
+    [onGetWorkingDiff, expandedWorkingFile, setExpandedWorkingFile, setWorkingFileDiff, onOpenDiffInEditor]
   )
 
   const handleStageFile = useCallback(

@@ -1,5 +1,6 @@
 import { useCallback } from 'react'
 import type { TFunction } from 'i18next'
+import { resolveGitCommitMessage } from '@baishou/shared'
 import type { GitManagementPageProps } from './git-management.types'
 import type { FileChange, FileDiff } from '@baishou/shared'
 
@@ -7,6 +8,7 @@ export interface UseGitManagementCommitParams {
   t: TFunction
   commitMessage: string
   setCommitMessage: (value: string) => void
+  onCommit?: GitManagementPageProps['onCommit']
   onCommitAll: GitManagementPageProps['onCommitAll']
   onPush: GitManagementPageProps['onPush']
   onToast: GitManagementPageProps['onToast']
@@ -22,6 +24,7 @@ export function useGitManagementCommit(params: UseGitManagementCommitParams) {
     t,
     commitMessage,
     setCommitMessage,
+    onCommit,
     onCommitAll,
     onPush,
     onToast,
@@ -33,6 +36,14 @@ export function useGitManagementCommit(params: UseGitManagementCommitParams) {
   } = params
 
   const performCommit = useCallback(async (msg: string) => onCommitAll(msg), [onCommitAll])
+
+  const performCommitStaged = useCallback(
+    async (msg: string) => {
+      if (onCommit) return onCommit(msg)
+      return onCommitAll(msg)
+    },
+    [onCommit, onCommitAll]
+  )
 
   const isAuthorNotConfiguredError = useCallback((error: unknown) => {
     const e = error as { name?: string; message?: string; cause?: { message?: string } }
@@ -89,10 +100,41 @@ export function useGitManagementCommit(params: UseGitManagementCommitParams) {
   )
 
   const handleManualCommit = useCallback(async () => {
-    const now = new Date()
-    const pad = (n: number) => String(n).padStart(2, '0')
-    const timestamp = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`
-    const msg = commitMessage.trim() || timestamp
+    const msg = resolveGitCommitMessage(commitMessage)
+    try {
+      const result = await performCommitStaged(msg)
+      const fileCount = result?.files?.length ?? 0
+      notifyCommitOutcome(fileCount, 'local')
+      if (fileCount === 0) return
+
+      setCommitMessage('')
+      handleRefreshStatus()
+      handleLoadHistory()
+    } catch (e: any) {
+      const errorMsg = e?.message || ''
+      if (errorMsg.includes('No changes')) {
+        notifyCommitOutcome(0, 'local')
+      } else if (isAuthorNotConfiguredError(e)) {
+        notifyAuthorNotConfigured()
+      } else {
+        onToast(errorMsg || t('version_control.git_commit_failed', '提交失败'), 'error')
+      }
+    }
+  }, [
+    commitMessage,
+    performCommitStaged,
+    notifyCommitOutcome,
+    isAuthorNotConfiguredError,
+    notifyAuthorNotConfigured,
+    onToast,
+    t,
+    setCommitMessage,
+    handleRefreshStatus,
+    handleLoadHistory
+  ])
+
+  const handleCommitAll = useCallback(async () => {
+    const msg = resolveGitCommitMessage(commitMessage)
     try {
       const result = await performCommit(msg)
       const fileCount = result?.files?.length ?? 0
@@ -120,15 +162,13 @@ export function useGitManagementCommit(params: UseGitManagementCommitParams) {
     notifyAuthorNotConfigured,
     onToast,
     t,
+    setCommitMessage,
     handleRefreshStatus,
     handleLoadHistory
   ])
 
   const handleCommitAndPush = useCallback(async () => {
-    const now = new Date()
-    const pad = (n: number) => String(n).padStart(2, '0')
-    const timestamp = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`
-    const msg = commitMessage.trim() || timestamp
+    const msg = resolveGitCommitMessage(commitMessage)
     try {
       const result = await performCommit(msg)
       const fileCount = result?.files?.length ?? 0
@@ -170,9 +210,13 @@ export function useGitManagementCommit(params: UseGitManagementCommitParams) {
     onPush,
     onToast,
     t,
+    setCommitMessage,
+    setSelectedCommit,
+    setCommitChanges,
+    setSelectedFileDiff,
     handleRefreshStatus,
     handleLoadHistory
   ])
 
-  return { handleManualCommit, handleCommitAndPush }
+  return { handleManualCommit, handleCommitAll, handleCommitAndPush }
 }
