@@ -134,6 +134,7 @@ Thanks to everyone who has contributed time and energy to BaiShou—together, yo
 <a href="https://github.com/ctnilpp" title="ctnilpp"><img src="https://avatars.githubusercontent.com/u/49940531?v=4&s=240" width="80" height="80" alt="ctnilpp" style="border-radius:50%;"/></a>
 <a href="https://github.com/fisHarly0" title="fisHarly0"><img src="https://avatars.githubusercontent.com/u/188205924?v=4&s=240" width="80" height="80" alt="fisHarly0" style="border-radius:50%;"/></a>
 <a href="https://github.com/david082321" title="david082321"><img src="https://avatars.githubusercontent.com/u/7046617?v=4&s=240" width="80" height="80" alt="david082321" style="border-radius:50%;"/></a>
+<a href="https://github.com/Magnemomet" title="Magnemomet"><img src="https://avatars.githubusercontent.com/u/269363200?v=4&s=240" width="80" height="80" alt="Magnemomet" style="border-radius:50%;"/></a>
 <!-- CONTRIBUTORS-WALL:END -->
 
 [View full contributors list](https://github.com/foxletters-hq/BaiShou-Next/graphs/contributors)
